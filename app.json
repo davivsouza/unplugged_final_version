@@ -1,0 +1,47 @@
+{
+  "expo": {
+    "name": "Unplugged",
+    "slug": "unplugged",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "cover",
+      "backgroundColor": "#000"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "infoPlist": {
+        "UIBackgroundModes": [
+          "audio"
+        ]
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#000"
+      },
+      "permissions": [
+        "AUDIO_RECORDING",
+        "AUDIO_SETTINGS",
+        "WAKE_LOCK",
+        "FOREGROUND_SERVICE"
+      ],
+      "package": "com.unplugged"
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "1e6daee0-d11e-4f74-9bef-4cbd6a9ce38b"
+      }
+    }
+  }
+}
