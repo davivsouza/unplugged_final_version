@@ -1,5 +1,5 @@
 import { createContext, useEffect, useState } from "react";
-import { NativeModules, Alert } from "react-native";
+import { NativeModules, Alert, AppState } from "react-native";
 type UsageStatsContextProviderProps = {
   children: React.ReactNode;
 };
@@ -22,6 +22,7 @@ export function UsageStatsContextProvider({
   const [isLoadingApps, setIsLoadingApps] = useState(false);
   const [apps, setApps] = useState<AppUsage[]>([]);
   const [totalUsageTime, setTotalUsageTime] = useState(0);
+  const [hasPermission, setHasPermission] = useState(false);
   const fetchUsageStats = async () => {
     try {
       setIsLoadingApps(true);
@@ -93,8 +94,23 @@ export function UsageStatsContextProvider({
   //   }
   // }
 
+
   useEffect(() => {
-    NativeModules.UsageStatsModule.checkUsageStatsPermission().then((hasPermission: boolean) => {
+    let appStateListener: any;
+
+    const checkPermission = async () => {
+      const permission = await NativeModules.UsageStatsModule.checkUsageStatsPermission();
+      setHasPermission(permission);
+    };
+
+    appStateListener = AppState.addEventListener('change', checkPermission);
+
+    // Limpeza na desmontagem
+    return () => {
+      appStateListener.remove()
+  }}, []);
+
+  useEffect(() => {
       if(hasPermission){
         fetchUsageStats();
       }
@@ -114,8 +130,8 @@ export function UsageStatsContextProvider({
           { cancelable: false }
         );
       }
-    });
-  }, []);
+   
+  }, [hasPermission]);
 
   return (
     <UsageStatsContext.Provider
