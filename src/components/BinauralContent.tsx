@@ -47,8 +47,6 @@ export function BinauralContent() {
 
   useEffect(() => {
     fetchBinauralSounds();
-
-
   }, [])
 
 

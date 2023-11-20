@@ -45,32 +45,7 @@ export function Journey() {
     fetchModules()
   }, []))
 
-  const fetchUsageStats = async () => {
-    try {
-      const startTime = String(Date.now() - 24 * 60 * 60 * 1000); // Exemplo: 24 horas atrás
-      const endTime = String(Date.now()); // Exemplo: momento atual
-
-      const stats = await NativeModules.UsageStatsModule.getAppUsage(
-        startTime,
-        endTime,
-      );
-
-      
-      const filteredStats = stats.filter(app => app.appName !== '' && app.usageTime > 300); // 5 minutos = 300 segundos
-
-    // Processar os aplicativos filtrados
-    console.log(filteredStats);
-      // Processar as estatísticas de uso de aplicativos
-    } catch (error) {
-      console.log(error);
-      // Lidar com erros
-    }
-  };
-  useEffect(() => {
-
-    fetchUsageStats();
-   
-  }, [])
+  
 
   return (
     <ScreenContainer>

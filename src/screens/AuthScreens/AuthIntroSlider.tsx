@@ -27,7 +27,7 @@ export function AuthIntroSlider() {
     navigation.navigate("signUp");
   }
   return (
-    <VStack flex={1}>
+    <VStack  py={90} flex={1}>
       <ChangeScreenButton onPress={handleGoBack} />
       <Carousel
         data={slides}

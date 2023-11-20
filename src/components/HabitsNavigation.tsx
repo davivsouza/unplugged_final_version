@@ -20,11 +20,11 @@ export function HabitsNavigation({ selectedItem, onSelectItem }: Props) {
         isSelected={selectedItem === "metas" && true}
         onPress={() => onSelectItem("metas")}
       />
-      {/* <DetailsButton
+      <DetailsButton
         title="Controle"
         isSelected={selectedItem === "controle" && true}
         onPress={() => onSelectItem("controle")}
-      /> */}
+      />
 
     </HStack>
   )

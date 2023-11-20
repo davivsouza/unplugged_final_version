@@ -15,7 +15,7 @@ export function Welcome() {
     navigation.navigate('signIn')
   }
   return (
-    <VStack flex={1} bg="white">
+    <VStack  py={90} flex={1} bg="white">
       <FormHeader heading="Vamos Começar" text="Escolha umas das opções abaixo." />
       <VStack my={8} alignItems="flex-start">
         <Animated.View entering={FadeInDown.delay(200).duration(1000).springify()} style={{

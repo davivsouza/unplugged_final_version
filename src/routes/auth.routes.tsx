@@ -28,7 +28,6 @@ export function AuthRoutes({ hasAlreadyTriedToLogin }: Props) {
       initialRouteName={hasAlreadyTriedToLogin ? 'signIn' : 'welcome'}
       screenOptions={{
         headerShown: false, contentStyle: {
-          paddingVertical: 90,
           paddingHorizontal: 32,
         }
       }}>

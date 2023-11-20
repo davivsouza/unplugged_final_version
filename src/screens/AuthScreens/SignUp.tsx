@@ -1,4 +1,4 @@
-import { Text, VStack } from "native-base";
+import { ScrollView, Text, VStack } from "native-base";
 import { FormHeader } from "@components/FormHeader";
 import { Input } from "@components/Input";
 import { useNavigation } from "@react-navigation/native";
@@ -64,7 +64,9 @@ export function SignUp() {
     }
   }
   return (
-    <VStack flex={1} bg="white">
+    <ScrollView py={90} height="full" showsVerticalScrollIndicator={false} flex={1} contentContainerStyle={{paddingBottom:120}}>
+
+    <VStack  flex={1}>
       {usernameForm ? (
         <UsernameForm tempData={tempUserData} onOpenUsernameForm={setUsernameForm} />
       ) : (
@@ -167,5 +169,6 @@ export function SignUp() {
         </>
       )}
     </VStack>
+    </ScrollView>
   );
 }
