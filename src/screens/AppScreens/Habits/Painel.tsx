@@ -12,29 +12,20 @@ import {
 import { VictoryBar, VictoryChart, VictoryAxis } from "victory-native";
 import { useNavigation } from "@react-navigation/native";
 import { AppNavigatorRoutesProps } from "@routes/app.routes";
-import { WellbeingApp } from "@components/WellbeingApp";
-import { AntDesign } from "@expo/vector-icons";
 
 import GoBackSvg from "@assets/goback.svg";
-import TikTokIcon from "@assets/habits/tiktok.png";
-import InstagramIcon from "@assets/habits/instagram.png";
-import TwitterIcon from "@assets/habits/twitter.png";
 import dayjs from "dayjs";
 import "dayjs/locale/pt-br";
-import { formatTime, formatTimeHours } from "@utils/formatTime";
+import { formatTimeHours } from "@utils/formatTime";
 import { useAuth } from "@hooks/useAuth";
 import { imagesUrl } from "@utils/baseUrls";
 import { useEffect, useState } from "react";
 import { NativeModules } from "react-native";
 import { changeColorBySecondsTime } from "@utils/changeColorBySecondsTime";
 import { Loading } from "@components/Loading";
+import { useUsageStats } from "@hooks/useUsageStats";
 
-interface AppUsage {
-  package: string;
-  name: string;
-  usageTime: number;
-  appIcon: string;
-}
+
 
 const day = dayjs().locale("pt-br").format("DD").toString();
 const month = dayjs().locale("pt-br").format("MMMM").toString();
@@ -62,74 +53,16 @@ export function Painel() {
   const { colors } = useTheme();
   const { navigate, goBack } = useNavigation<AppNavigatorRoutesProps>();
   const { user } = useAuth();
-  const [apps, setApps] = useState<any>([]);
-  const [totalUsageTime, setTotalUsageTime] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
+  const {apps,totalUsageTime, isLoadingApps} = useUsageStats()
   function handleNavigate() {
     goBack();
   }
 
-  const fetchUsageStats = async () => {
-    try {
-      setIsLoading(true);
-      const startTime = String(Date.now() - 24 * 60 * 60 * 1000); // Exemplo: 24 horas atrás
-      const endTime = String(Date.now()); // Exemplo: momento atual
-
-      const stats = await NativeModules.UsageStatsModule.getAppUsage(
-        startTime,
-        endTime
-      );
-
-      const uniqueApps: { [key: string]: AppUsage } = {};
-      const processedStats: AppUsage[] = [];
-        
-      stats.forEach((app) => {
-       
-        
-        if (app.name !== "(unknown)" && app.usageTime > 300) {
-          if (
-            !uniqueApps[app.package] ||
-            app.usageTime > uniqueApps[app.package].usageTime
-          ) {
-            uniqueApps[app.package] = app;
-          }
-        }
-      });
-
-      Object.values(uniqueApps).sort((a, b) => b.usageTime - a.usageTime).forEach((app) => {
-        const icon = `data:image/png;base64,${app.appIcon}`;
-        processedStats.push({
-          package: app.package,
-          name: app.name,
-          usageTime: app.usageTime,
-          appIcon: icon,
-        });
-      });
-      
-
-      const totalUsageInSeconds: number = processedStats.reduce(
-        (total: number, app: AppUsage) => total + app.usageTime,
-        0
-      );
-
-      setTotalUsageTime(totalUsageInSeconds);
-
-      setApps(processedStats);
-    } catch (error) {
-      console.log(error);
-      // Lidar com erros
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  useEffect(() => {
-    fetchUsageStats();
-  }, []);
 
   return (
     <ScreenContainer py={0} pt={10}>
-      {isLoading && <Loading />}
-      {!isLoading && (
+      {isLoadingApps && <Loading />}
+      {!isLoadingApps && (
         <>
           <HStack alignItems="center" justifyContent="space-between">
             <Pressable
@@ -251,11 +184,8 @@ export function Painel() {
                 />
               </VictoryChart>
             </Box>
-            <Pressable onPress={async () => {
-              await NativeModules.UsageStatsModule.openUsageAccessSettings()
-            }}>
-              <Text color="red.200">Open settings</Text>
-            </Pressable>
+            
+             
             <Text color="gray.200" fontSize="lg" fontFamily="body" mt={12}>
               Tempo de uso:
             </Text>

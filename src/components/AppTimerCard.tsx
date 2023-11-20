@@ -53,8 +53,8 @@ export function AppTimerCard({ onDeleteTimer, timer }: Props) {
     >
       <HStack alignItems="center" justifyContent="space-between" flex={1} >
         <HStack alignItems="center" space={4}>
-          <Image source={checkIconUrl(timer.iconUrl)} alt={timer.appName} width={50} height={50} bg="white" rounded="lg" resizeMode="contain" />
-          <Text color="white" fontSize="xl" fontFamily="semiBold">
+          <Image source={{uri: timer.iconUrl}} alt={timer.appName} style={{ width: 50, height: 50 }}   />
+          <Text color="white" fontSize="md" fontFamily="semiBold">
             {timer.appName}
           </Text>
         </HStack>

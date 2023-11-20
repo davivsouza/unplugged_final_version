@@ -32,6 +32,9 @@ import java.io.FileOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 
+import android.app.AppOpsManager;
+import android.content.Context;
+
 public class UsageStatsModule extends ReactContextBaseJavaModule {
     private final ReactApplicationContext reactContext;
 
@@ -121,11 +124,20 @@ private String bitmapToBase64(Bitmap bitmap) {
 
 
  @ReactMethod
-    public void openUsageAccessSettings() {
-        Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        reactContext.startActivity(intent);
-    } 
+public void openUsageAccessSettings() {
+    Intent intent = new Intent(Settings.ACTION_USAGE_ACCESS_SETTINGS);
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    reactContext.startActivity(intent);
+} 
+
+@ReactMethod
+public void checkUsageStatsPermission(Promise promise) {
+    AppOpsManager appOps = (AppOpsManager) reactContext.getSystemService(Context.APP_OPS_SERVICE);
+    int mode = appOps.checkOpNoThrow(AppOpsManager.OPSTR_GET_USAGE_STATS, android.os.Process.myUid(), reactContext.getPackageName());
+    promise.resolve(mode == AppOpsManager.MODE_ALLOWED);
+}
+
+
     
 
 }

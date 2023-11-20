@@ -1,36 +1,40 @@
-import { SvgProps } from "react-native-svg"
-import { WellbeingApp } from "./WellbeingApp"
-import { Box, HStack, IPressableProps, Pressable } from "native-base"
-import { SelectedApp } from "./HabitsControlSetTimerModal"
-import { ImageSourcePropType } from "react-native"
+import { SvgProps } from "react-native-svg";
+import { WellbeingApp } from "./WellbeingApp";
+import {
+  Box,
+  HStack,
+  IPressableProps,
+  Image,
+  Pressable,
+  Text,
+  VStack,
+} from "native-base";
+import { ImageSourcePropType } from "react-native";
+import { useUsageStats } from "@hooks/useUsageStats";
+import { AppUsage } from "@contexts/UsageStatsContext";
+import { changeColorBySecondsTime } from "@utils/changeColorBySecondsTime";
+import { formatTimeHours } from "@utils/formatTime";
 
 type Props = IPressableProps & {
-  icon: ImageSourcePropType
-  appName: string
-  selectedApp: SelectedApp
+  app: AppUsage;
+  selectedApp: AppUsage;
+};
 
-}
-
-
-export function HabitsControlTimerAppBox({ appName, selectedApp, icon, ...rest }: Props) {
-
-
+export function HabitsControlTimerAppBox({ app, selectedApp, ...rest }: Props) {
   return (
-    <Pressable
-      {...rest}
-    >
+    <Pressable {...rest}>
       <HStack alignItems="center" mt={4}>
         <Box
           mr={4}
           w={6}
           h={6}
           borderWidth={2}
-          borderColor={selectedApp.appName === appName ? "purple.500" : 'white'}
+          borderColor={selectedApp.name === app.name ? "purple.500" : "white"}
           rounded="full"
           justifyContent="center"
           alignItems="center"
           style={{
-            padding: 2
+            padding: 2,
           }}
         >
           <Box
@@ -38,11 +42,41 @@ export function HabitsControlTimerAppBox({ appName, selectedApp, icon, ...rest }
             h={3}
             p={2}
             rounded="full"
-
-            bg={selectedApp.appName === appName ? "purple.500" : 'transparent'} />
+            bg={selectedApp.name === app.name ? "purple.500" : "transparent"}
+          />
         </Box>
-        <WellbeingApp appName={appName} icon={icon} />
+
+        <HStack
+          flex={1}
+          alignItems="center"
+          justifyContent="space-between"
+          key={app.package}
+        >
+          <HStack alignItems="center" space={2}>
+            <Image
+              source={{ uri: app.appIcon }}
+              alt={app.name}
+              style={{ width: 50, height: 50 }}
+            />
+
+            <Text color="white" fontFamily="body" fontSize="md">
+              {app.name}
+            </Text>
+          </HStack>
+
+          <VStack alignItems="flex-end">
+            <Box
+              width={5}
+              height={1}
+              bg={changeColorBySecondsTime(app.usageTime)}
+              rounded="full"
+            />
+            <Text color="white" fontFamily="body" fontSize="sm">
+              {formatTimeHours(app.usageTime)}
+            </Text>
+          </VStack>
+        </HStack>
       </HStack>
     </Pressable>
-  )
+  );
 }
