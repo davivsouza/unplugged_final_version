@@ -13,6 +13,8 @@ export type UsageStatsContextData = {
   apps: AppUsage[];
   totalUsageTime: number;
   isLoadingApps: boolean;
+  fetchUsageStats: () => Promise<void>
+  checkPermission(): Promise<void>
 };
 export const UsageStatsContext = createContext({} as UsageStatsContextData);
 
@@ -23,6 +25,7 @@ export function UsageStatsContextProvider({
   const [apps, setApps] = useState<AppUsage[]>([]);
   const [totalUsageTime, setTotalUsageTime] = useState(0);
   const [hasPermission, setHasPermission] = useState(false);
+
   const fetchUsageStats = async () => {
     try {
       setIsLoadingApps(true);
@@ -38,7 +41,7 @@ export function UsageStatsContextProvider({
       const processedStats: AppUsage[] = [];
 
       stats.forEach((app: AppUsage) => {
-        if (app.name !== "(unknown)" && app.usageTime > 900) {
+        if (app.name !== "(unknown)" && app.usageTime > 300) {
           if (
             !uniqueApps[app.package] ||
             app.usageTime > uniqueApps[app.package].usageTime
@@ -94,44 +97,33 @@ export function UsageStatsContextProvider({
   //   }
   // }
 
+  async function checkPermission(){
+    
+    const permission = await NativeModules.UsageStatsModule.checkUsageStatsPermission();
+    if(permission){
+      fetchUsageStats();
+    }
+    if (!permission) {
+      Alert.alert(
+        "Permissão para acessar as estatísticas de uso.",
+        "Para o aplicativo funcionar de forma adequada é necessário que você permita ele acessaras estatísticas de uso.",
+        [
+          {
+            text: "Cancelar",
+            style: "cancel",
+          },
+          { text: "OK", onPress: () => {
+            openAcessUsageSettings()
+          } },
+        ],
+        { cancelable: false }
+      );
+    }
+  }
 
-  useEffect(() => {
-    let appStateListener: any;
+ 
 
-    const checkPermission = async () => {
-      const permission = await NativeModules.UsageStatsModule.checkUsageStatsPermission();
-      setHasPermission(permission);
-    };
 
-    appStateListener = AppState.addEventListener('change', checkPermission);
-
-    // Limpeza na desmontagem
-    return () => {
-      appStateListener.remove()
-  }}, []);
-
-  useEffect(() => {
-      if(hasPermission){
-        fetchUsageStats();
-      }
-      if (!hasPermission) {
-        Alert.alert(
-          "Permissão para acessar as estatísticas de uso.",
-          "Para o aplicativo funcionar de forma adequada é necessário que você permita ele acessaras estatísticas de uso.",
-          [
-            {
-              text: "Cancelar",
-              style: "cancel",
-            },
-            { text: "OK", onPress: () => {
-              openAcessUsageSettings()
-            } },
-          ],
-          { cancelable: false }
-        );
-      }
-   
-  }, [hasPermission]);
 
   return (
     <UsageStatsContext.Provider
@@ -139,6 +131,8 @@ export function UsageStatsContextProvider({
         apps,
         isLoadingApps,
         totalUsageTime,
+        fetchUsageStats,
+        checkPermission
       }}
     >
       {children}

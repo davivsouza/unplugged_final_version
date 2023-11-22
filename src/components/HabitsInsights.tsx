@@ -16,6 +16,36 @@ import { AppNavigatorRoutesProps } from "@routes/app.routes";
 import { useUsageStats } from "@hooks/useUsageStats";
 import { AppUsage } from "@contexts/UsageStatsContext";
 import { useState } from "react";
+const daysOfWeek = [
+  {
+    dayNumber: 0,
+    day: "Dom",
+  },
+  {
+    dayNumber: 1,
+    day: "Seg",
+  },
+  {
+    dayNumber: 2,
+    day: "Ter",
+  },
+  {
+    dayNumber: 3,
+    day: "Qua",
+  },
+  {
+    dayNumber: 4,
+    day: "Qui",
+  },
+  {
+    dayNumber: 5,
+    day: "Sex",
+  },
+  {
+    dayNumber: 6,
+    day: "Sáb",
+  },
+];
 
 type PieData = {
   x: string;
@@ -25,7 +55,7 @@ type PieData = {
 
 export function HabitsInsights() {
   const { colors } = useTheme();
-  const { navigate } = useNavigation<AppNavigatorRoutesProps>();
+  const { jumpTo } = useNavigation<AppNavigatorRoutesProps>();
   const { apps } = useUsageStats();
   let pieData: PieData[] = [];
   const pie_colors = [
@@ -60,15 +90,14 @@ export function HabitsInsights() {
     pieData = [...topApps];
   }
 
-
-  const formatLabel = (datum) => {
+  const formatLabel = (datum: { x: string }) => {
     // Adicione uma quebra de linha após o primeiro espaço
-    const label = datum.x.replace(' ', '\n');
+    const label = datum.x.replace(" ", "\n");
     return label;
   };
-  
+
   function handleNavigate() {
-    navigate("bemestarPainel");
+    jumpTo("bemestarPainel");
   }
 
   return (
@@ -101,7 +130,7 @@ export function HabitsInsights() {
           colorScale={pieData.map((data) => data.color)}
           innerRadius={90}
           style={{
-            labels: { fill: "white", fontSize: 16, textAlign: "center"},
+            labels: { fill: "white", fontSize: 16, textAlign: "center" },
           }}
           labels={({ datum }) => formatLabel(datum)}
           startAngle={-20}
@@ -124,7 +153,26 @@ export function HabitsInsights() {
             </Text>
           </HStack>
         </HStack>
-        <HabitsChart />
+        <ScrollView
+          horizontal
+          mt={15}
+          width="100%"
+          contentContainerStyle={{
+            alignItems: "center",
+            paddingTop: 200,
+          }}
+          showsHorizontalScrollIndicator={false}
+        >
+          <HStack>
+            {daysOfWeek.map((day) => (
+              <HabitsChart
+                key={day.day}
+                dayNumber={day.dayNumber}
+                weekDay={day.day}
+              />
+            ))}
+          </HStack>
+        </ScrollView>
       </InsightsCard>
     </ScrollView>
   );

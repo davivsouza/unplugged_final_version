@@ -10,7 +10,8 @@ import { useFocusEffect } from "@react-navigation/native";
 import { AppError } from "@utils/AppError";
 import { Loading } from "@components/Loading";
 import Animated, { FadeInDown, FadeInLeft } from "react-native-reanimated";
-import { NativeModules, Platform } from "react-native";
+import { AppState, NativeModules, Platform } from "react-native";
+import { useUsageStats } from "@hooks/useUsageStats";
 
 
 export function Journey() {
@@ -18,7 +19,7 @@ export function Journey() {
   const [isFetching, setIsFetching] = useState(false)
   const { user } = useAuth();
   const toast = useToast()
-
+  const {fetchUsageStats, checkPermission} = useUsageStats()
 
 
   async function fetchModules() {
@@ -42,10 +43,21 @@ export function Journey() {
 
   }
   useFocusEffect(useCallback(() => {
+
+
     fetchModules()
   }, []))
 
+  useEffect(() => {
+      let appStateListener: any;
+      checkPermission()
+      appStateListener = AppState.addEventListener('change', checkPermission);
   
+      // Limpeza na desmontagem
+      return () => {
+        appStateListener.remove()
+      }
+  }, [])
 
   return (
     <ScreenContainer>

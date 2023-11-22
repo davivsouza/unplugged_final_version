@@ -1,27 +1,32 @@
 import { Box, HStack, Progress, ScrollView, Text, VStack } from "native-base";
 import { HabitsChartItem } from "./HabitsChartItem";
+import { useEffect, useState } from "react";
+import { api } from "../services/api";
+import { useAuth } from "@hooks/useAuth";
+import { useGoals } from "@hooks/useGoals";
 type Props = {
-  weekDay: string
-}
-export function HabitsChart() {
+  weekDay: string;
+  dayNumber: number;
+};
+export function HabitsChart({ weekDay, dayNumber }: Props) {
+  const { user } = useAuth();
+  const [habitDayLength, setHabitDayLength] = useState(0);
+  const [totalHabitsDayLength, setTotalHabitsDayLength] = useState(0);
+
+  async function fetchHabitsLog() {
+    const {data : habitsOfTheDayWeek} = await api.get(`habits/${user.id}/dayOfWeek/${dayNumber}`)
+    
+    const { data: habitsCompletedByDayWeek } = await api.get(
+      `/habits/completed-habits/${user.id}/dayOfWeek/${dayNumber}`
+    );
+    setHabitDayLength(habitsCompletedByDayWeek.length);
+    setTotalHabitsDayLength(habitsOfTheDayWeek.length)
+  }
+
+  useEffect(() => {
+    fetchHabitsLog();
+  }, []);
   return (
-    <ScrollView horizontal  mt={15} width="100%" contentContainerStyle={{
-      alignItems: 'center',
-      paddingTop: 200
-    }}
-    showsHorizontalScrollIndicator={false}>
-      <HStack>
-
-        <HabitsChartItem weekDay="Dom" maxTask={10} taskCompleted={5} w={20} />
-        <HabitsChartItem weekDay="Seg" maxTask={4} taskCompleted={3} w={20} />
-        <HabitsChartItem weekDay="Ter" maxTask={7} taskCompleted={2}  w={20}/>
-        <HabitsChartItem weekDay="Qua" maxTask={2} taskCompleted={1}  w={20}/>
-        <HabitsChartItem weekDay="Qui" maxTask={5} taskCompleted={0}  w={20}/>
-        <HabitsChartItem weekDay="Sex" maxTask={3} taskCompleted={0}  w={20}/>
-        <HabitsChartItem weekDay="Sáb" maxTask={3} taskCompleted={0}  w={20}/>
-        
-      </HStack>
-    </ScrollView>
-
-  )
+    <HabitsChartItem weekDay={weekDay} maxTask={totalHabitsDayLength} taskCompleted={habitDayLength} w={20} />
+  );
 }
